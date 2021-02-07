@@ -1052,6 +1052,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4000012002607164}
   - component: {fileID: 7864374179005115987}
+  - component: {fileID: 7944517393397878981}
   m_Layer: 0
   m_Name: T95-1
   m_TagString: Untagged
@@ -1094,6 +1095,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
+--- !u!65 &7944517393397878981
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000011176054850}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 4.908468, y: 2.540761, z: 8.273584}
+  m_Center: {x: -0.021263361, y: 1.1124444, z: 0.80397034}
 --- !u!1 &1000011243523046
 GameObject:
   m_ObjectHideFlags: 0
