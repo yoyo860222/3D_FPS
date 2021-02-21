@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
+using System.Collections;
 
 public class FPSController : MonoBehaviour
 {
@@ -26,17 +28,34 @@ public class FPSController : MonoBehaviour
     public int bulletTotal = 150;
     [Header("子彈速度")]
     public int bulletSpeed = 1000;
+    [Header("彈匣存量顯示")]
+    public Text textBulletCurrent;
+    [Header("子彈總數顯示")]
+    public Text textBulletTotal;
+    [Header("換彈時間"), Range(0, 5)]
+    public float addBulletsTime = 1;
+    [Header("開槍音效")]
+    public AudioClip soundFire;
+    [Header("換彈匣音效")]
+    public AudioClip soundAddBullet;
+    [Header("開槍間隔時間"), Range(0f, 1f)]
+    public float fireInterval = 0.1f; 
+
     #endregion
 
-
+    private bool isAddBullet;
+    private float timer;
     private Animator ani;
     private Rigidbody rig;
+    private AudioSource aud;
+    
 
     private void Awake()
     {
         Cursor.visible = false;                    //游標 隱藏
         ani = GetComponent<Animator>();
         rig = GetComponent<Rigidbody>();
+        aud = GetComponent<AudioSource>();
     }
 
     private void OnDrawGizmos()
@@ -50,15 +69,67 @@ public class FPSController : MonoBehaviour
         Move();
         Jump();
         Fire();
+        AddBullet();
     }
 
     private void Fire()
     {
-        if (Input.GetKeyDown(KeyCode.Mouse0))
+        if (Input.GetKey(KeyCode.Mouse0) && bulletCurrent > 0 && !isAddBullet)
         {
-            GameObject temp = Instantiate(bullet, pointFire.position, pointFire.rotation);
-            temp.GetComponent<Rigidbody>().AddForce(pointFire.forward * bulletSpeed);
+            if (timer >= fireInterval)
+            {
+                timer = 0;
+                ani.SetTrigger("開槍觸發");
+                aud.PlayOneShot(soundFire, Random.Range(0.8f, 1.2f));
+                //扣除子彈
+                bulletCurrent--;
+                textBulletCurrent.text = bulletCurrent.ToString();
+
+                //暫存子彈 = 生成(物件，座標，角度)
+                GameObject temp = Instantiate(bullet, pointFire.position, pointFire.rotation);
+                temp.GetComponent<Rigidbody>().AddForce(pointFire.forward * bulletSpeed);
+            }
+            else timer += Time.deltaTime;
         }
+    }
+
+    private void AddBullet()
+    {
+        if (Input.GetKeyDown(KeyCode.R) && !isAddBullet &&bulletTotal > 0 && bulletCurrent < 30) StartCoroutine(AddBulletDelay());
+    }
+
+    /// <summary>
+    /// 補充子彈協程
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator AddBulletDelay()
+    {
+        ani.SetTrigger("換彈觸發");
+        aud.PlayOneShot(soundAddBullet, 1);
+                
+        isAddBullet = true;
+        yield return new WaitForSeconds(addBulletsTime);
+        isAddBullet = false;
+
+        if (bulletCurrent < 30) ;
+        {
+            int add = 30 - bulletCurrent;  //計算捕幾顆子彈
+
+            if (bulletTotal >= add)        //如果子彈總數 大於 要補充的子彈
+            {
+                bulletCurrent += add;
+                bulletTotal -= add;
+            }
+            else                           //否則 將剩餘的總數 補充過來
+            {
+                bulletCurrent += bulletTotal;
+                bulletTotal = 0;
+            }
+
+            textBulletCurrent.text = bulletCurrent.ToString();
+            textBulletTotal.text = bulletTotal.ToString();
+        }
+        
     }
 
     private void Jump()
