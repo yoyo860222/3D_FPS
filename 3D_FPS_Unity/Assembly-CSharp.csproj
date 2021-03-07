@@ -111,6 +111,7 @@
     <Compile Include="Assets\DreamForestTree\PostProcessing\Runtime\Utils\RenderTextureFactory.cs" />
     <Compile Include="Assets\DreamForestTree\Script\FreeCam.cs" />
     <Compile Include="Assets\DreamForestTree\Script\ScrollUVWater.cs" />
+    <Compile Include="Assets\Script\Bullet.cs" />
     <Compile Include="Assets\Script\Enemy.cs" />
     <Compile Include="Assets\Script\FPSController.cs" />
     <None Include="Assets\DreamForestTree\PostProcessing\Resources\Shaders\ScreenSpaceReflection.shader" />

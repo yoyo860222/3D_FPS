@@ -9,7 +9,8 @@ public class Enemy : MonoBehaviour
     private Animator ani;
 
     private float timer;
-
+    private bool isAddBullet;
+    
     [Header("移動速度"), Range(0, 30)]
     public float speed = 2.5f;
     [Header("攻擊範圍"), Range(2, 100)]
@@ -30,6 +31,11 @@ public class Enemy : MonoBehaviour
     public int bulletClip = 30;
     [Header("換彈匣時間"), Range(0f, 5f)]
     public float addBulletTime = 2.5f;
+    [Header("血量"), Range(10 ,200)]
+    public float hp = 100;
+    
+
+
 
     private void Awake()
     {
@@ -48,6 +54,7 @@ public class Enemy : MonoBehaviour
 
     private void Update()
     {
+        if (isAddBullet) return;
         Track();
     }
 
@@ -104,7 +111,32 @@ public class Enemy : MonoBehaviour
     private IEnumerator AddBullet()
     {
         ani.SetTrigger("換彈");
+        isAddBullet = true;
         yield return new WaitForSeconds(addBulletTime);
+        isAddBullet = false;
         bulletCount += bulletClip;
+    }
+
+    private void Damage(float getDamage)
+    {
+        hp -= getDamage;
+        if (hp <= 0) Dead();
+    }
+
+    private void Dead()
+    {
+        ani.SetTrigger("死亡");
+        GetComponent<SphereCollider>().enabled = false;
+        GetComponent<CapsuleCollider>().enabled = false;
+        enabled = false;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "子彈")
+        {
+            float damage = collision.gameObject.GetComponent<Bullet>().attack;
+            Damage(5);
+        }
     }
 }

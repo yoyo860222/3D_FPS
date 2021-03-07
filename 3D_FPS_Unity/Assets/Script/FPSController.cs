@@ -15,6 +15,8 @@ public class FPSController : MonoBehaviour
     public Vector3 floorOffset;
     [Header("地板偵測半徑"), Range(0, 2000)]
     public float floorRaduis = 1;
+    [Header("攻擊力"), Range(0f, 100f)]
+    public float attack = 5f;
     #endregion
 
     #region 開槍宣告
@@ -88,6 +90,7 @@ public class FPSController : MonoBehaviour
                 //暫存子彈 = 生成(物件，座標，角度)
                 GameObject temp = Instantiate(bullet, pointFire.position, pointFire.rotation);
                 temp.GetComponent<Rigidbody>().AddForce(pointFire.forward * bulletSpeed);
+                temp.GetComponent<Bullet>().attack = attack;
             }
             else timer += Time.deltaTime;
         }
@@ -111,7 +114,7 @@ public class FPSController : MonoBehaviour
         yield return new WaitForSeconds(addBulletsTime);
         isAddBullet = false;
 
-        if (bulletCurrent < 30) ;
+        if (bulletCurrent < 30)
         {
             int add = 30 - bulletCurrent;  //計算捕幾顆子彈
 
