@@ -937,11 +937,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 2.7
-  rangeAttack: 5
+  rangeAttack: 10
   point: {fileID: 123047495}
   bullet: {fileID: 2820413988267851867, guid: 033573ef83ac0274f9409cb48bc6c452, type: 3}
   speedBullet: 500
-  interval: 0.5
+  interval: 0.1
+  speedFace: 5
+  bulletCount: 30
+  bulletClip: 30
+  addBulletTime: 2.5
 --- !u!1001 &462930066
 PrefabInstance:
   m_ObjectHideFlags: 0

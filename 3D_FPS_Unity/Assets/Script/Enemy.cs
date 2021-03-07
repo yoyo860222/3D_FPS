@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
+using System.Collections;
 
 public class Enemy : MonoBehaviour
 {
@@ -21,6 +22,14 @@ public class Enemy : MonoBehaviour
     public float speedBullet = 500;
     [Header("開槍間隔"), Range(0f, 5f)]
     public float interval = 0.5f;
+    [Header("轉身速度"), Range(0f, 100f)]
+    public float speedFace = 10f;
+    [Header("子彈目前數量")]
+    public int bulletCount = 30 ;
+    [Header("彈匣數量")]
+    public int bulletClip = 30;
+    [Header("換彈匣時間"), Range(0f, 5f)]
+    public float addBulletTime = 2.5f;
 
     private void Awake()
     {
@@ -64,16 +73,38 @@ public class Enemy : MonoBehaviour
         if (timer >= interval)
         {
             timer = 0;
-            Instantiate(bullet, point.position, point.rotation);
+            GameObject temp = Instantiate(bullet, point.position, point.rotation);
+            temp.GetComponent<Rigidbody>().AddForce(point.right * -speedBullet);
+            ManageBulletCount();
         }
         else
         {
+            FaceToPlayer();
             timer += Time.deltaTime;
         }
 
 
     }
 
+    private void FaceToPlayer()
+    {
+        Quaternion faceAngle = Quaternion.LookRotation(player.position - transform.position);
+        transform.rotation = Quaternion.Lerp(transform.rotation, faceAngle, Time.deltaTime * speedFace);
+    }
 
+    private void ManageBulletCount()
+    {
+        bulletCount--;
+        if (bulletCount <= 0)
+        {
+            StartCoroutine(AddBullet());
+        }
+    }
 
+    private IEnumerator AddBullet()
+    {
+        ani.SetTrigger("換彈");
+        yield return new WaitForSeconds(addBulletTime);
+        bulletCount += bulletClip;
+    }
 }
