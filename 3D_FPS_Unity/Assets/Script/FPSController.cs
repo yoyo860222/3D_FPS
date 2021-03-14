@@ -17,6 +17,7 @@ public class FPSController : MonoBehaviour
     public float floorRaduis = 1;
     [Header("攻擊力"), Range(0f, 100f)]
     public float attack = 5f;
+    
     #endregion
 
     #region 開槍宣告
@@ -50,7 +51,9 @@ public class FPSController : MonoBehaviour
     private Animator ani;
     private Rigidbody rig;
     private AudioSource aud;
-    
+
+    private Transform traMain;
+    private Transform traCam;
 
     private void Awake()
     {
@@ -58,6 +61,11 @@ public class FPSController : MonoBehaviour
         ani = GetComponent<Animator>();
         rig = GetComponent<Rigidbody>();
         aud = GetComponent<AudioSource>();
+
+        traMain = transform.Find("Main Camera");
+        traCam = transform.Find("Player Camera");
+
+
     }
 
     private void OnDrawGizmos()
@@ -135,6 +143,30 @@ public class FPSController : MonoBehaviour
         
     }
 
+    private IEnumerator MoveCamera()
+    {
+        traMain.LookAt(transform);
+        traCam.LookAt(transform);
+
+        Vector3 posCam = traMain.position;
+
+        float yCam = posCam.y;
+        float yUp = posCam.y + 3;
+
+        //while 迴圈 (執行條件)
+        while (yCam < yUp)
+        {
+            yCam += 0.05f;               //遞增 執行每次 += 0.05
+            posCam.y = yCam;                //更新 Vector3 yCam
+
+            traMain.position = posCam;        //更新 攝影機 座標
+            traCam.position = posCam;
+
+            yield return new WaitForSeconds(0.05f);      //等待
+        }
+
+    }
+
     private void Jump()
     {
         Collider[] hit = Physics.OverlapSphere(transform.position + floorOffset, floorRaduis, 1 << 8);
@@ -159,4 +191,44 @@ public class FPSController : MonoBehaviour
     }
 
 
+    #region 血條UI
+    private float hp = 100;
+    private float hpMax = 100;
+
+    [Header("血量與血條")]
+    public Text textHp;
+    public Image imgHp;
+    #endregion
+
+
+    private void Damage(float getDamage)
+    {
+        if (hp <= 0) return;
+
+        hp -= getDamage;
+
+        if (hp <= 0) Dead();
+        textHp.text = hp.ToString();
+        imgHp.fillAmount = hp / hpMax;
+    }
+
+    
+    private void Dead()
+    {
+        hp = 0;
+        ani.SetTrigger("死亡觸發");        
+        enabled = false;
+        rig.mass = 50;
+
+        StartCoroutine(MoveCamera());
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "子彈")
+        {
+            float damage = collision.gameObject.GetComponent<Bullet>().attack;
+            Damage(damage);
+        }
+    }
 }

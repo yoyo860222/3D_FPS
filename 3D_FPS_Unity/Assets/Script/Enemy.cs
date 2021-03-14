@@ -15,6 +15,8 @@ public class Enemy : MonoBehaviour
     public float speed = 2.5f;
     [Header("攻擊範圍"), Range(2, 100)]
     public float rangeAttack = 5f;
+    [Header("攻擊力"), Range(0f, 100f)]
+    public float attack = 5f;
     [Header("子彈生成位置")]
     public Transform point;
     [Header("子彈")]
@@ -82,6 +84,7 @@ public class Enemy : MonoBehaviour
             timer = 0;
             GameObject temp = Instantiate(bullet, point.position, point.rotation);
             temp.GetComponent<Rigidbody>().AddForce(point.right * -speedBullet);
+            temp.GetComponent<Bullet>().attack = attack;
             ManageBulletCount();
         }
         else
@@ -136,7 +139,7 @@ public class Enemy : MonoBehaviour
         if (collision.gameObject.tag == "子彈")
         {
             float damage = collision.gameObject.GetComponent<Bullet>().attack;
-            Damage(5);
+            Damage(damage);
         }
     }
 }
