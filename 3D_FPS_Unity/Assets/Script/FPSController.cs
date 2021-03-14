@@ -17,7 +17,11 @@ public class FPSController : MonoBehaviour
     public float floorRaduis = 1;
     [Header("攻擊力"), Range(0f, 100f)]
     public float attack = 5f;
-    
+    [Header("鏡頭速度"), Range(0f, 5f)]
+    public float cameraSpeed = 0.5f;
+    [Header("鏡頭上下限制")]
+    public Vector2 cameraLimit = new Vector2(2, 4);
+
     #endregion
 
     #region 開槍宣告
@@ -51,6 +55,7 @@ public class FPSController : MonoBehaviour
     private Animator ani;
     private Rigidbody rig;
     private AudioSource aud;
+    private Transform target;
 
     private Transform traMain;
     private Transform traCam;
@@ -62,9 +67,9 @@ public class FPSController : MonoBehaviour
         rig = GetComponent<Rigidbody>();
         aud = GetComponent<AudioSource>();
 
-        traMain = transform.Find("Main Camera");
-        traCam = transform.Find("Player Camera");
-
+        traMain = transform.Find("攝影機物件").Find("Main Camera");
+        traCam = transform.Find("攝影機物件").Find("Player Camera");
+        target = transform.Find("目標");
 
     }
 
@@ -170,7 +175,7 @@ public class FPSController : MonoBehaviour
     private void Jump()
     {
         Collider[] hit = Physics.OverlapSphere(transform.position + floorOffset, floorRaduis, 1 << 8);
-        print(hit[0].name);
+        
 
         if (hit.Length > 0 && hit[0] && Input.GetKeyDown(KeyCode.Space))
         {
@@ -187,7 +192,12 @@ public class FPSController : MonoBehaviour
 
         float X = Input.GetAxis("Mouse X");                  //偵查 滑鼠 左右移動
         transform.Rotate(0, X * Time.deltaTime * turn, 0);
-        
+
+        float y = Input.GetAxis("Mouse Y");
+        Vector3 posTarget = target.localPosition ;
+        posTarget.y += y * Time.deltaTime * cameraSpeed;
+        posTarget.y = Mathf.Clamp(posTarget.y, cameraLimit.x, cameraLimit.y);
+        target.localPosition = posTarget;
     }
 
 
