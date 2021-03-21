@@ -52,6 +52,7 @@ public class FPSController : MonoBehaviour
 
     private bool isAddBullet;
     private float timer;
+    private GameManager gm;
     private Animator ani;
     private Rigidbody rig;
     private AudioSource aud;
@@ -66,6 +67,8 @@ public class FPSController : MonoBehaviour
         ani = GetComponent<Animator>();
         rig = GetComponent<Rigidbody>();
         aud = GetComponent<AudioSource>();
+
+        gm = FindObjectOfType<GameManager>();
 
         traMain = transform.Find("攝影機物件").Find("Main Camera");
         traCam = transform.Find("攝影機物件").Find("Player Camera");
@@ -231,13 +234,22 @@ public class FPSController : MonoBehaviour
         rig.mass = 50;
 
         StartCoroutine(MoveCamera());
+
+        gm.UpdateDataDead(gm.killNpc1, gm.textPlayer, "",ref  gm.deadPlayer);
+
+        if (nameEnemy.Contains("壞人 1")) gm.UpdateDataKill(ref gm.killNpc1, gm.textNpc1, "", gm.deadNpc1);
+        else if (nameEnemy.Contains("壞人 2")) gm.UpdateDataKill(ref gm.killNpc2, gm.textNpc2, "", gm.deadNpc2);
+        else if (nameEnemy.Contains("壞人 3")) gm.UpdateDataKill(ref gm.killNpc3, gm.textNpc3, "", gm.deadNpc3);
     }
+
+    private string nameEnemy;       //紀錄被誰打到
 
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag == "子彈")
         {
             float damage = collision.gameObject.GetComponent<Bullet>().attack;
+            nameEnemy = collision.gameObject.name;
             Damage(damage);
         }
     }

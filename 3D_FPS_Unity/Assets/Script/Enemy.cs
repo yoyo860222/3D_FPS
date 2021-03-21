@@ -4,6 +4,8 @@ using System.Collections;
 
 public class Enemy : MonoBehaviour
 {
+
+    private GameManager gm;
     private Transform player;
     private NavMeshAgent nav;
     private Animator ani;
@@ -46,6 +48,8 @@ public class Enemy : MonoBehaviour
         nav = GetComponent<NavMeshAgent>();
         nav.speed = speed;
         nav.stoppingDistance = rangeAttack;
+
+        gm = FindObjectOfType<GameManager>();
     }
 
     private void OnDrawGizmos()
@@ -85,6 +89,7 @@ public class Enemy : MonoBehaviour
             GameObject temp = Instantiate(bullet, point.position, point.rotation);
             temp.GetComponent<Rigidbody>().AddForce(point.right * -speedBullet);
             temp.GetComponent<Bullet>().attack = attack;
+            temp.name += name;    //將子彈標注發射者
             ManageBulletCount();
         }
         else
@@ -132,6 +137,12 @@ public class Enemy : MonoBehaviour
         GetComponent<SphereCollider>().enabled = false;
         GetComponent<CapsuleCollider>().enabled = false;
         enabled = false;
+
+        gm.UpdateDataKill(ref gm.killPlayer, gm.textPlayer, "", gm.deadPlayer);
+
+        if (name == "壞人 1") gm.UpdateDataDead(gm.killNpc1, gm.textNpc1, " ", ref gm.deadNpc1);
+        else if (name == "壞人 2") gm.UpdateDataDead(gm.killNpc2, gm.textNpc2, " ", ref gm.deadNpc2);
+        else if (name == "壞人 3") gm.UpdateDataDead(gm.killNpc3, gm.textNpc3, " ", ref gm.deadNpc3);
     }
 
     private void OnCollisionEnter(Collision collision)
