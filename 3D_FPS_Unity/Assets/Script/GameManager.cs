@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
-    
+
     public int killPlayer;
     public int killNpc1;
     public int killNpc2;
@@ -16,6 +17,7 @@ public class GameManager : MonoBehaviour
     public int deadNpc3;
 
     private int enemyCount;
+    private bool gameOver;
 
     [Header("勝利/失敗")]
     public Text winOrLose;
@@ -30,13 +32,17 @@ public class GameManager : MonoBehaviour
     [Header("結算畫面顯示")]
     public CanvasGroup group;
 
+    private void Update()
+    {
+        Replay();
+    }
     public void UpdateDataKill(ref int kill, Text textKill, string content, int dead)
     {
         kill++;
         textKill.text = content + kill + "           " + dead;
     }
 
-    public void UpdateDataDead(int kill, Text textDead, string content,ref int dead)
+    public void UpdateDataDead(int kill, Text textDead, string content, ref int dead)
     {
         dead++;
         textDead.text = content + kill + "           " + dead;
@@ -66,5 +72,13 @@ public class GameManager : MonoBehaviour
             yield return new WaitForSeconds(0.1f);
 
         }
+        gameOver = true;
+    }
+
+    private void Replay()
+    {
+        if (Input.GetKeyDown(KeyCode.Space) && gameOver) SceneManager.LoadScene("遊戲場景");
     }
 }
+
+
